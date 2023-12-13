@@ -1,12 +1,30 @@
 #!/bin/sh
-for jpg; do                                  # use $jpg in place of each filename given, in turn
-    png=${jpg%.jpg}.png                      # construct the PNG version of the filename by replacing .jpg with .png
-    printf 'converting "%s" ...\n' "$jpg"    # output status info to the user running the script
-    if convert "$jpg" jpg.to.png; then       # use convert (provided by ImageMagick) to create the PNG in a temp file
-        mv jpg.to.png "$png"                 # if it worked, rename the temporary PNG image to the correct name
-    else                                     # ...otherwise complain and exit from the script
-        printf >&2 'jpg2png: error: failed output saved in "jpg.to.png".\n'
+
+if [ $# -lt 2 ]; then
+    echo "Ange filändelse att konvertera från och filändelse att konvertera till."
+    exit 1
+fi
+
+from_extension="$1"
+to_extension="$2"
+
+shift 2  # Hoppa över de två första argumenten som är filändelserna
+
+for filename in *."$from_extension"; do
+    if [ -f "$filename" ]; then
+        new_filename="${filename%.$from_extension}.$to_extension"
+        printf 'Konverterar "%s" till "%s" ...\n' "$filename" "$new_filename"
+
+        if convert "$filename" "$new_filename"; then
+            printf 'Konvertering lyckades.\n'
+        else
+            printf >&2 'Fel: Konvertering misslyckades för filen "%s".\n' "$filename"
+            exit 1
+        fi
+    else
+        printf >&2 'Fel: Ingen fil med filändelsen "%s" hittades.\n' "$from_extension"
         exit 1
-    fi                                       # the end of the "if" test construct
-done                                         # the end of the "for" loop
-printf 'all conversions successful\n'        # tell the user the good news
+    fi
+done
+
+printf 'Alla konverteringar lyckades.\n'
