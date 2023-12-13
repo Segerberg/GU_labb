@@ -1,14 +1,17 @@
 #!/bin/sh
 
-if [ $# -lt 2 ]; then
-    echo "Ange filändelse att konvertera från och filändelse att konvertera till."
+if [ $# -lt 3 ]; then
+    echo "Ange katalog, filändelse att konvertera från och filändelse att konvertera till."
     exit 1
 fi
 
-from_extension="$1"
-to_extension="$2"
+directory="$1"
+from_extension="$2"
+to_extension="$3"
 
-shift 2  # Hoppa över de två första argumenten som är filändelserna
+shift 3  # Hoppa över de tre första argumenten som är katalog och filändelserna
+
+cd "$directory" || exit 1
 
 for filename in *."$from_extension"; do
     if [ -f "$filename" ]; then
